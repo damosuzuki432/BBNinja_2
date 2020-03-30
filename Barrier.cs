@@ -5,31 +5,34 @@ using UnityEngine;
 public class Barrier : MonoBehaviour
 {
     [SerializeField] AudioClip barrierSFX;
+    [SerializeField] GameObject barrier;
+    Vector2 barrierPos;
+    paddle paddle;
 
-    private void Awake()
-    {
-        int barrierCount = FindObjectsOfType<Barrier>().Length;
-        if (barrierCount > 1)
-        {
-            Destroy(gameObject);
-        }
-        else
-        {
-            DontDestroyOnLoad(gameObject);
-        }
-    }
+
+    //todo barrier disappers when scene transition. why?
 
     // Start is called before the first frame update
     void Start()
     {
-        
+        //TODO it must be a fixed pos 
+        paddle = FindObjectOfType<paddle>();
+        barrierPos = new Vector2(paddle.transform.position.x,
+                                 paddle.transform.position.y - 0.5f);
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+
     }
+
+
+    public void CreateBarrier()
+    {
+        Instantiate(barrier, barrierPos, transform.rotation);
+    }
+        
 
     private void OnCollisionEnter2D(Collision2D collision)
     {

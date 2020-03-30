@@ -9,10 +9,11 @@ public class ChargeManager : MonoBehaviour
     string StageName; //to test if the stage is more than 2-
     [SerializeField] public Image chargeImage;
     [SerializeField] Sprite[] chargeSprites;
-    [SerializeField] GameObject barrier;
-    [SerializeField] GameObject barrier2;
+    //[SerializeField] GameObject barrier;
+    //[SerializeField] GameObject barrier2;
     int chargeCounter = 0;
     ArrowGenerator arrowGenerator;
+    Barrier barrier;
     [SerializeField]AudioClip chargeSound;
     public bool chargeLevel_1 = false;
     public bool chargeLevel_2 = false;
@@ -34,7 +35,7 @@ public class ChargeManager : MonoBehaviour
 
     private void ChargeController()
     {
-        if(chargeCounter >= 10 && 20 >= chargeCounter &&
+        if(chargeCounter >= 1 && 2 >= chargeCounter &&
             chargeImage.sprite != chargeSprites[1])
         {
             chargeImage = GetComponent<Image>();
@@ -47,7 +48,7 @@ public class ChargeManager : MonoBehaviour
                 arrowGenerator.CreateArrow();
             }
         }
-        if (chargeCounter >= 21 && 30 >= chargeCounter &&
+        if (chargeCounter >= 3 && 4 >= chargeCounter &&
             chargeImage.sprite != chargeSprites[2])
         {
             chargeImage = GetComponent<Image>();
@@ -61,14 +62,16 @@ public class ChargeManager : MonoBehaviour
                 arrowGenerator.CreateArrow();
             }
         }
-        if (31 <= chargeCounter && 40 >= chargeCounter)
+        if (6 <= chargeCounter && 40 >= chargeCounter)
         {
             chargeImage = GetComponent<Image>();
             chargeImage.sprite = chargeSprites[3];
             if (chargeLevel_3 == false)
             {
                 ChargeSFX();
-                barrier.SetActive(true);
+                barrier = FindObjectOfType<Barrier>();
+                barrier.CreateBarrier();
+                //barrier.SetActive(true);
                 chargeLevel_3 = true;
             }
 
@@ -80,7 +83,7 @@ public class ChargeManager : MonoBehaviour
             if (chargeLevel_4 == false)
             {
                 ChargeSFX();
-                barrier2.SetActive(true);
+                //barrier2.SetActive(true);
                 chargeLevel_4 = true;
             }
 
@@ -121,8 +124,8 @@ public class ChargeManager : MonoBehaviour
         chargeLevel_5 = false;
         chargeImage = GetComponent<Image>();
         chargeImage.sprite = chargeSprites[0];
-        barrier.SetActive(false);
-        barrier2.SetActive(false);
+        //barrier.SetActive(false);
+        //barrier2.SetActive(false);
         //TODO diable barrier when time-up
     }
 }
