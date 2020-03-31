@@ -14,6 +14,9 @@ public class ChargeManager : MonoBehaviour
     int chargeCounter = 0;
     ArrowGenerator arrowGenerator;
     Barrier barrier;
+    Barrier2 barrier2;
+    BarrierItself barrierItself;
+    Barrier2Itself barrier2Itself;
     [SerializeField]AudioClip chargeSound;
     public bool chargeLevel_1 = false;
     public bool chargeLevel_2 = false;
@@ -24,7 +27,17 @@ public class ChargeManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        SceneManager.activeSceneChanged += OnActiveSceneChanged;
+
+    }
+
+    void OnActiveSceneChanged(Scene prevScene, Scene nextScene)
+    {
+        if (chargeLevel_5 == true)
+        {
+            FindObjectOfType<Ball>().maxCharge = true;
+        }
+
     }
 
     // Update is called once per frame
@@ -62,7 +75,7 @@ public class ChargeManager : MonoBehaviour
                 arrowGenerator.CreateArrow();
             }
         }
-        if (6 <= chargeCounter && 40 >= chargeCounter)
+        if (6 <= chargeCounter && 8 >= chargeCounter)
         {
             chargeImage = GetComponent<Image>();
             chargeImage.sprite = chargeSprites[3];
@@ -71,28 +84,35 @@ public class ChargeManager : MonoBehaviour
                 ChargeSFX();
                 barrier = FindObjectOfType<Barrier>();
                 barrier.CreateBarrier();
-                //barrier.SetActive(true);
                 chargeLevel_3 = true;
             }
 
         }
-        if (41 <= chargeCounter && 50 >= chargeCounter)
+        if (9 <= chargeCounter && 10 >= chargeCounter)
         {
             chargeImage = GetComponent<Image>();
             chargeImage.sprite = chargeSprites[4];
             if (chargeLevel_4 == false)
             {
                 ChargeSFX();
-                //barrier2.SetActive(true);
+                barrier2 = FindObjectOfType<Barrier2>();
+                barrier2.CreateBarrier();
                 chargeLevel_4 = true;
             }
 
         }
-        if (51 <= chargeCounter)
+        if (11 <= chargeCounter)
         {
             chargeImage = GetComponent<Image>();
             chargeImage.sprite = chargeSprites[5];
- 
+            if (chargeLevel_5 == false)
+            {
+                ChargeSFX();
+                FindObjectOfType<Ball>().maxCharge = true;
+                FindObjectOfType<Block>().IsPenetrate = true;
+
+                chargeLevel_5 = true;
+            }
         }
     }
 
@@ -115,17 +135,23 @@ public class ChargeManager : MonoBehaviour
 
     public void ResetCharge()
     {
-        Debug.Log("called7");
         chargeCounter = 0;
         chargeLevel_1 = false;
         chargeLevel_2 = false;
         chargeLevel_3 = false;
         chargeLevel_4 = false;
         chargeLevel_5 = false;
+
         chargeImage = GetComponent<Image>();
         chargeImage.sprite = chargeSprites[0];
-        //barrier.SetActive(false);
-        //barrier2.SetActive(false);
-        //TODO diable barrier when time-up
+
+        barrierItself = FindObjectOfType<BarrierItself>();
+        barrier2Itself = FindObjectOfType<Barrier2Itself>();
+        int barrierCount = FindObjectsOfType<BarrierItself>().Length;
+        int barrier2Count = FindObjectsOfType<Barrier2Itself>().Length;
+        if (barrierCount > 0) { barrierItself.SelfDestruct(); }
+        if (barrier2Count > 0) { barrier2Itself.SelfDestruct(); }
+
+
     }
 }

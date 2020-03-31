@@ -31,13 +31,25 @@ public class Block : MonoBehaviour
     //cached reference
     Rigidbody2D rigidbody;
     RareItemPanel rareItemPanel;
+    BoxCollider2D boxCollider2D;
 
     //hitpoints manager
     int timesHit = 0;
+
+    public bool IsPenetrate = false;
     
     private void Start()
     {
+        //Penetrate();
         rigidbody = GetComponent<Rigidbody2D>();
+    }
+
+    private void Update()
+    {
+        if (IsPenetrate == true)
+        {
+            Penetrate();
+        }
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -47,7 +59,7 @@ public class Block : MonoBehaviour
     }
 
 
-    private void OnParticleCollision(GameObject other)
+    private void OnParticleCollision(GameObject other) //for fireball(unused)
     {
         TriggerSFX();
         DestroyBlock();
@@ -182,4 +194,20 @@ public class Block : MonoBehaviour
             Debug.LogError("Block sprite is missing from array" + gameObject.name);
         }
     }
+
+    public void Penetrate() //for penetration ball 
+    {
+
+        boxCollider2D = GetComponent<BoxCollider2D>();
+        boxCollider2D.isTrigger = true;
+
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision) //for penetration ball
+    {
+        TriggerSFX();
+        DestroyBlock();
+    }
+
+
 }

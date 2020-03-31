@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Ball : MonoBehaviour
 {
@@ -27,6 +28,7 @@ Main functions are:
     [SerializeField] float randomFactor = 0.2f; // tweek for randomness of bounce
     [SerializeField] float left = -2.0f; //tweek for left edge NOTE right is negative of this
     [SerializeField] float ballConstSpeed = 8;
+    public bool maxCharge = false;
    
     //relationship between ball and paddle
     Vector2 ballPos; // position of the ball
@@ -42,17 +44,30 @@ Main functions are:
     //cached component reference
     AudioSource audioSource;
     Rigidbody2D rigidbody;
+    Animator animator;
+
+    private void Awake()
+    {
+        animator = gameObject.GetComponent<Animator>();
+    }
 
     // Start is called before the first frame update
     void Start()
     {
+        if(FindObjectOfType<ChargeManager>().chargeLevel_5 == true)
+        {
+            maxCharge = true;
+        }
+        
         //first, get component of audi and rigidbody
         audioSource = GetComponent<AudioSource>();
         rigidbody = GetComponent<Rigidbody2D>();
-
+     
         //then, get distance btw ball and paddle
         paddleToBallVector = transform.position - paddle1.transform.position;
-    }
+     }
+
+   
 
     // Update is called once per frame
     void Update()
@@ -71,6 +86,12 @@ Main functions are:
                 LaunchOnMouseClick();
             }
         }
+
+        if(maxCharge == true)
+        {
+            animator.SetBool("maxCharge", true); //this "maxCharge" is param of animator controller. differes from the bool in this cs.
+        }
+
     }
 
     private void LockBallToPaddle()
