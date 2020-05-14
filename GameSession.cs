@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using System;
+
 
 public class GameSession : MonoBehaviour
 {
@@ -27,12 +29,24 @@ the main funtions are:
     //Game Debug bool
     [SerializeField] bool isAutoPlayEnabled;
     public AudioSource[] audioClip;
-   
+
+    bool scoreThre1 = false;
+    bool scoreThre2 = false;
+    bool scoreThre3 = false;
+    bool scoreThre4 = false;
+    int threshold = 10000;
+
+    paddle paddle;
+
+    public enum State { title, Playable, Special, Clear } // Clear is unused.
+    public State state;
+
     // Start is called before the first frame update
     void Start()
     {
 
     }
+
 
     private void Awake()
     {
@@ -62,7 +76,17 @@ the main funtions are:
         
         //display score on scoreNumtext;
         scoreNum.text = score.ToString();
+        ScoreThreshold();
 
+    }
+
+    private void ScoreThreshold()
+    {
+        if(score > threshold)
+        {
+                FindObjectOfType<LifePanel>().IncreaseLife();       
+                threshold += 10000;
+        }       
     }
 
     public void ResetGame()
@@ -74,4 +98,19 @@ the main funtions are:
     {
         return isAutoPlayEnabled;
     }
+
+    
+    //TODO　シーンの切り替え時　title
+    //TODO ２秒後　playable
+    public void ToTitleState()
+    {
+        state = GameSession.State.title;
+    }
+    public void ToPlayableState()
+    {
+        state = GameSession.State.Playable;
+    }
+
+
+
 }

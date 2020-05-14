@@ -1,46 +1,35 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Barrier : MonoBehaviour
 {
-    [SerializeField] AudioClip barrierSFX;
     [SerializeField] GameObject barrier;
-    Vector2 barrierPos;
-    paddle paddle;
+    Vector3 barrierPos;
+    public bool barrierOn = false;
 
 
-    //todo barrier disappers when scene transition. why?
-
+    
     // Start is called before the first frame update
     void Start()
     {
-        //TODO it must be a fixed pos 
-        paddle = FindObjectOfType<paddle>();
-        barrierPos = new Vector2(paddle.transform.position.x,
-                                 paddle.transform.position.y - 0.5f);
+        SceneManager.activeSceneChanged += OnActiveSceneChanged;
+        barrierPos = new Vector3(6.2f, 1.15f, 1.0f);
     }
 
-    // Update is called once per frame
-    void Update()
+    void OnActiveSceneChanged(Scene prevScene, Scene nextScene)
     {
-
+        if (barrierOn == true)
+        {
+            CreateBarrier();
+        }
     }
-
 
     public void CreateBarrier()
     {
         Instantiate(barrier, barrierPos, transform.rotation);
+        barrierOn = true;
     }
         
-
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        if (collision.gameObject.tag == "Ball")
-        {
-            AudioSource.PlayClipAtPoint(barrierSFX, Camera.main.transform.position);
-            gameObject.SetActive(false);
-        }
-    }
-
 }

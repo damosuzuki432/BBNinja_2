@@ -47,15 +47,16 @@ the main funtions are:
         gameSession = FindObjectOfType<GameSession>();
         CheckNumOfBlocks("Block"); //TODO NOTE that the tag is hard coded
         ShowRequiredBlocks();
-        StartCoroutine(InactivateStageReady());
-        Invoke("TitleImageFinishedAndLetGo", 2.0f);
-        //Debug.Log(numblockObjects.Length);
+        Invoke("StageReady", 2.0f);
+       
     }
 
-    IEnumerator InactivateStageReady()
+  
+
+    private void StageReady()
     {
-        yield return new WaitForSeconds(2.0f);
         stageReadyPanel.SetActive(false);
+        FindObjectOfType<GameSession>().ToPlayableState();
     }
 
     public void CheckNumOfBlocks(string blockTagObjects)
@@ -68,10 +69,7 @@ the main funtions are:
         reqdNumBlock = Mathf.FloorToInt(numblockObject * reqdRatio);
         reqdBlocks.text = reqdNumBlock.ToString();
     }
-    private void TitleImageFinishedAndLetGo()
-    {
-        ball.state = Ball.State.Playable;
-    }
+
     
     // Update is called once per frame
     void Update()
@@ -86,8 +84,17 @@ the main funtions are:
         if (numblockObject == 0)
         {
             if (multiClear == true) {return;}
-            StartClearSequence();
+            if (gameSession.state == GameSession.State.Special)//if state == special, wait for a while till the VFX finsh to start StartClearSequence
+            {
+                ball.gameObject.SetActive(false); //inactivate ball
+                Invoke("StartClearSequence", 3.0f);
+            }
+            else
+            {
+                StartClearSequence();
+            }
         }
+
         if (reqdNumBlock == 0　&& timerText.seconds < 0)
         {
             if (multiClear == true) {return;}
@@ -107,26 +114,70 @@ the main funtions are:
     {
         ball.gameObject.SetActive(false); //inactivate ball
         FindObjectOfType<LifePanel>().DecraeseLife();
-        FindObjectOfType<LoseCollider>().Restart();
+        FindObjectOfType<GameSession>().ToTitleState();
         FindObjectOfType<ChargeManager>().ResetCharge();
-
         multiDeath = true;
-        ball.state = Ball.State.title;
+        //gameSession.state = GameSession.State.title;
     }
 
     private void StartClearSequence()
     {
-        //Debug.Log("clear");
-        ball.state = Ball.State.Clear; //TODO meaning of this? 
+
+        FindObjectOfType<GameSession>().ToTitleState();
         ball.gameObject.SetActive(false); //inactivate ball
         clearImage.SetActive(true); //show clear image
-        multiClear = true; //prevent multiple clear seq  
-        //Destroy(backGroundMusic); // stopBGM
-        //AudioSource.PlayClipAtPoint(clearJingle, Camera.main.transform.position); //play clear jingle
+        multiClear = true; //prevent multiple clear seq
+        string StageName = SceneManager.GetActiveScene().name;
+        if(StageName == "Stage4-1")
+        {
+
+            GameClear();
+        }
+        else if (StageName == "Stage1-9" || StageName == "Stage2-9"|| StageName == "Stage3-9")
+        {
+            ClearSection();
+        }
         //TODO stop time
         //TODO show button to next stage
         //TODO below is temporary
-        Invoke("LoadNextScene", 2.0f);
+        else
+        {
+
+            Invoke("LoadNextScene", 2.0f);
+        }
+    }
+
+    private void GameClear()
+    {
+
+        gameSession = FindObjectOfType<GameSession>();
+        gameSession.gameObject.SetActive(false);
+
+        
+        StartCoroutine(ToEnding());
+        
+
+    }
+
+    IEnumerator ToEnding()
+    {
+        FindObjectOfType<BGMmanager>().BGM_Stage4.Stop();
+       
+        yield return new WaitForSeconds(7f);
+       
+        FindObjectOfType<BGMmanager>().BGM_Stage5.Play();
+        yield return new WaitForSeconds(1.5f);
+        FindObjectOfType<SceneLoader>().LoadNextScene();
+        yield break;
+    }
+
+    private void ClearSection()
+    {
+        FindObjectOfType<BGMmanager>().BGM_Stage1.Stop();
+        FindObjectOfType<BGMmanager>().BGM_Stage2.Stop();
+        FindObjectOfType<BGMmanager>().BGM_Stage3.Stop();
+        AudioSource.PlayClipAtPoint(clearJingle, Camera.main.transform.position); //play clear jingle
+        Invoke("LoadNextScene", 4.0f);
     }
 
     public void LoadNextScene()

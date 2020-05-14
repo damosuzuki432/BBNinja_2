@@ -31,18 +31,23 @@ Main functions are:
 
 
 
-
     // Start is called before the first frame update
     void Start()
     {
         ball = FindObjectOfType<Ball>();
         gamesession = FindObjectOfType<GameSession>();
+      
     }
+
 
     // Update is called once per frame
     void Update()
     {
-        if(ball.state == Ball.State.Playable)
+        if(gamesession.state == GameSession.State.title) //to avoid missing reference. IDK the reason but its necessary!!
+        {
+            gamesession = FindObjectOfType<GameSession>();
+        }
+        if (gamesession.state == GameSession.State.Playable)
         {
             //the paddle moved along with the mouse Xpos.
             //the mouse pos is dependent on screen with and witdth in units.
@@ -51,7 +56,9 @@ Main functions are:
             ClampedMousePosInUnits = Mathf.Clamp(GetXpos(), minX, maxX);
             paddlePos = new Vector2(ClampedMousePosInUnits, fixedYpos);
             transform.position = paddlePos;
+            
         }
+       
     }
 
     private float GetXpos()

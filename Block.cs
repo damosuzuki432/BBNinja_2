@@ -33,23 +33,17 @@ public class Block : MonoBehaviour
     RareItemPanel rareItemPanel;
     BoxCollider2D boxCollider2D;
 
+    public bool IsPenetrate =false;
+
     //hitpoints manager
     int timesHit = 0;
 
-    public bool IsPenetrate = false;
-    
+   
     private void Start()
-    {
-        //Penetrate();
+    { 
         rigidbody = GetComponent<Rigidbody2D>();
-    }
-
-    private void Update()
-    {
-        if (IsPenetrate == true)
-        {
-            Penetrate();
-        }
+        boxCollider2D = GetComponent<BoxCollider2D>();
+        
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -59,7 +53,13 @@ public class Block : MonoBehaviour
     }
 
 
-    private void OnParticleCollision(GameObject other) //for fireball(unused)
+    private void OnParticleCollision(GameObject other) //for fireball (when block trigger is off)
+    {
+        TriggerSFX();
+        DestroyBlock();
+    }
+
+    private void OnParticleTrigger() //for fireball (when block trigger is on)
     {
         TriggerSFX();
         DestroyBlock();
@@ -111,7 +111,7 @@ public class Block : MonoBehaviour
     }
 
     
-    private void TriggerSparklesVFX()
+    public void TriggerSparklesVFX()
     {
         GameObject sparkles = Instantiate(blockSparklesVFX, transform.position, transform.rotation);
         Destroy(sparkles, 1.0f);
@@ -185,6 +185,12 @@ public class Block : MonoBehaviour
 
         //Just in case, lets avoid when dmgSprites is null!
         //we tend to forget to set them in the inspector.
+
+        Animator animator = GetComponent<Animator>();
+        if (animator != null)
+        {
+            animator.enabled = false;
+        }
         if (dmgSprites[spriteIndex] != null)
         {
             GetComponent<SpriteRenderer>().sprite = dmgSprites[spriteIndex];
@@ -195,19 +201,13 @@ public class Block : MonoBehaviour
         }
     }
 
-    public void Penetrate() //for penetration ball 
+
+    private void OnTriggerEnter2D(Collider2D collision) //for penetration ball and glass block
     {
 
-        boxCollider2D = GetComponent<BoxCollider2D>();
-        boxCollider2D.isTrigger = true;
-
-    }
-
-    private void OnTriggerEnter2D(Collider2D collision) //for penetration ball
-    {
         TriggerSFX();
         DestroyBlock();
+
+        
     }
-
-
 }

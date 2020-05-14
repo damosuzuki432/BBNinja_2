@@ -9,8 +9,6 @@ public class ChargeManager : MonoBehaviour
     string StageName; //to test if the stage is more than 2-
     [SerializeField] public Image chargeImage;
     [SerializeField] Sprite[] chargeSprites;
-    //[SerializeField] GameObject barrier;
-    //[SerializeField] GameObject barrier2;
     int chargeCounter = 0;
     ArrowGenerator arrowGenerator;
     Barrier barrier;
@@ -18,6 +16,7 @@ public class ChargeManager : MonoBehaviour
     BarrierItself barrierItself;
     Barrier2Itself barrier2Itself;
     [SerializeField]AudioClip chargeSound;
+    GameObject[] blocks;
     public bool chargeLevel_1 = false;
     public bool chargeLevel_2 = false;
     public bool chargeLevel_3 = false;
@@ -28,7 +27,6 @@ public class ChargeManager : MonoBehaviour
     void Start()
     {
         SceneManager.activeSceneChanged += OnActiveSceneChanged;
-
     }
 
     void OnActiveSceneChanged(Scene prevScene, Scene nextScene)
@@ -36,6 +34,7 @@ public class ChargeManager : MonoBehaviour
         if (chargeLevel_5 == true)
         {
             FindObjectOfType<Ball>().maxCharge = true;
+            PenetrateBall();
         }
 
     }
@@ -75,7 +74,7 @@ public class ChargeManager : MonoBehaviour
                 arrowGenerator.CreateArrow();
             }
         }
-        if (6 <= chargeCounter && 8 >= chargeCounter)
+        if (5 <= chargeCounter && 6 >= chargeCounter)
         {
             chargeImage = GetComponent<Image>();
             chargeImage.sprite = chargeSprites[3];
@@ -88,7 +87,7 @@ public class ChargeManager : MonoBehaviour
             }
 
         }
-        if (9 <= chargeCounter && 10 >= chargeCounter)
+        if (7 <= chargeCounter && 8 >= chargeCounter)
         {
             chargeImage = GetComponent<Image>();
             chargeImage.sprite = chargeSprites[4];
@@ -101,7 +100,7 @@ public class ChargeManager : MonoBehaviour
             }
 
         }
-        if (11 <= chargeCounter)
+        if (9 <= chargeCounter)
         {
             chargeImage = GetComponent<Image>();
             chargeImage.sprite = chargeSprites[5];
@@ -109,10 +108,20 @@ public class ChargeManager : MonoBehaviour
             {
                 ChargeSFX();
                 FindObjectOfType<Ball>().maxCharge = true;
-                FindObjectOfType<Block>().IsPenetrate = true;
-
+                PenetrateBall();
+                StartCoroutine(StopPenetration());
                 chargeLevel_5 = true;
             }
+        }
+    }
+
+    private void PenetrateBall()
+    {
+        blocks = GameObject.FindGameObjectsWithTag("Block");
+        foreach (GameObject block in blocks)
+        {
+            if (block.GetComponent<BoxCollider2D>() == null) { return; } // debug for Shogun(circle collider)
+            block.GetComponent<BoxCollider2D>().isTrigger = true;
         }
     }
 
@@ -129,8 +138,45 @@ public class ChargeManager : MonoBehaviour
         string chkStageName = StageName.Substring(5, 1); //see the 6th alphabet of the stagename
         if (chkStageName != "1")
         {
-            chargeCounter++;
+            GameSession gameSession = FindObjectOfType<GameSession>();
+            if(gameSession.state == GameSession.State.Playable)
+            {
+                chargeCounter++; //accumulate only when state is playable. without this, charge occurs After losing ball when shuriken breaks blocks.
+            }
         }
+    }
+
+    IEnumerator StopPenetration()
+    {
+        yield return new WaitForSeconds(5.0f);
+        if (FindObjectOfType<Ball>() == null)// for the case when the ball is missing since scene transition!
+           {
+            //TODO if state == dying, yield break here.
+            //TODO if state == title, meaning scene transition, let's wait till(loop) scene == playable.
+            //TODO if in 7sec Ball is still null, try again after 1 sec. to go on.
+             yield return new WaitForSeconds(7.0f);
+           }
+
+           FindObjectOfType<Ball>().maxCharge = false;
+           blocks = GameObject.FindGameObjectsWithTag("Block");
+           chargeLevel_5 = false;
+           chargeImage = GetComponent<Image>();
+           chargeImage.sprite = chargeSprites[4];
+           chargeCounter = 7;
+           foreach (GameObject block in blocks)
+            {
+                string gameObjectName = block.name;
+                if (block.name.Contains("GR"))
+                {
+                    continue; //debug for glass block
+                }
+                if (block.GetComponent<BoxCollider2D>() == null)
+                {
+                    continue; // debug for Shogun(circle collider)
+                }
+              block.GetComponent<BoxCollider2D>().isTrigger = false;
+            }
+        yield break;
     }
 
     public void ResetCharge()

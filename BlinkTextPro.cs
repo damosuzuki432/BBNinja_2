@@ -6,13 +6,16 @@ using TMPro;
 
 public class BlinkTextPro : MonoBehaviour
 {
-    //public Text text;
+    /// <summary>
+    /// attach to textMeshPro that you want to blink
+    /// </summary>
+
+
     TextMeshProUGUI tmProUGUI;
     [Range(0.1f,0.5f)][SerializeField] float blinkSpeed = 0.5f;
 
     private void Start()
     {
-        //text = GetComponent<Text>();
         tmProUGUI = GetComponent<TextMeshProUGUI>();
         StartBlinking();
     }

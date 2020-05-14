@@ -7,6 +7,22 @@ public class RareItem : MonoBehaviour
 {
     //SFX reference
     [SerializeField] AudioClip audioClip;
+    GameSession gameSession;
+
+    private void Start()
+    {
+        gameSession = FindObjectOfType<GameSession>();
+
+    }
+
+    private void Update()
+    {
+        if (gameSession.state == GameSession.State.title
+            || gameSession.state == GameSession.State.Special)
+        {
+            Destroy(gameObject);
+        }
+    }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {

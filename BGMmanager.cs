@@ -5,10 +5,18 @@ using UnityEngine.SceneManagement;
 
 public class BGMmanager : MonoBehaviour
 {
+    /// <summary>
+    /// manage the bgm of the entire scene, other than opening scene.
+    /// </summary>
+
+
     string StageName; //to see the stage num
     public AudioSource BGM_Stage1;
     public AudioSource BGM_Stage2;
     public AudioSource BGM_Stage3;
+    public AudioSource BGM_Stage4;
+    public AudioSource BGM_Stage5;
+
     private string previousScene = "Stage1-9"; //the name of the previous scene
 
     private void Awake()
@@ -25,12 +33,16 @@ public class BGMmanager : MonoBehaviour
        
     }
 
+
     // Start is called before the first frame update
     void Start()
     {
         SceneManager.activeSceneChanged += OnActiveSceneChanged;
         StageName = SceneManager.GetActiveScene().name;
         string chkStageName = StageName.Substring(5, 1); //see the 6th alphabet of the stagename
+
+        //BGM_stage1 is play on awake, so it has to stop when scene is other than stage1-x.
+
         if (chkStageName == "2")
         {
             BGM_Stage1.Stop();
@@ -41,11 +53,30 @@ public class BGMmanager : MonoBehaviour
             BGM_Stage1.Stop();
             BGM_Stage3.Play();
         }
+        else if (chkStageName == "4")
+        {
+            BGM_Stage1.Stop();
+            BGM_Stage4.Play();
+        }
+        else if (chkStageName == "5")
+        {
+            BGM_Stage1.Stop();
+            BGM_Stage5.Play();
+        }
+
     }
 
+    void LoadNextScene()
+    {
+        Debug.LogError("what's the purpose of this?");
+        int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
+        SceneManager.LoadScene(currentSceneIndex + 1);
+    }
 
     void OnActiveSceneChanged(Scene prevScene, Scene nextScene)
     {
+        //BGM_stage1 is play on awake, so it has to stop when scene is other than stage1-x.
+
         if (nextScene.name == "Stage2-1")
         {
             if (BGM_Stage2.isPlaying) { return; }
@@ -58,10 +89,18 @@ public class BGMmanager : MonoBehaviour
             BGM_Stage2.Stop();
             BGM_Stage3.Play();
         }
+        else if (nextScene.name == "Stage4-1")
+        {
+            if (BGM_Stage4.isPlaying) { return; }
+            BGM_Stage3.Stop();
+            BGM_Stage4.Play();
+        }
+        else if (nextScene.name == "Stage5-1")
+        {
+            if (BGM_Stage5.isPlaying) { return; }
+            BGM_Stage4.Stop();
+            BGM_Stage5.Play();
+        }
     }
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+   
 }

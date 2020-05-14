@@ -23,12 +23,14 @@ Main functions are:
     //config params
     [SerializeField] paddle paddle1; //paddle referenc
     [SerializeField] AudioClip[] audioClips; //audio reference
+
     [SerializeField] float xThrow = 2f; //tweek for first shot vector x
     [SerializeField] float yThrow = 15f; // tweek for first shot vector y
     [SerializeField] float randomFactor = 0.2f; // tweek for randomness of bounce
     [SerializeField] float left = -2.0f; //tweek for left edge NOTE right is negative of this
     [SerializeField] float ballConstSpeed = 8;
-    public bool maxCharge = false;
+
+    public bool maxCharge = false; //penetration ball
    
     //relationship between ball and paddle
     Vector2 ballPos; // position of the ball
@@ -38,41 +40,46 @@ Main functions are:
     public bool hasStarted = false; //hasn't started by default
     bool ReleaseEnabler = true; //enabled to release by default
 
-    public enum State {title, Playable, Dying, Clear}
-    public State state = State.title;
-
+   
     //cached component reference
+    GameSession gameSession;
     AudioSource audioSource;
     Rigidbody2D rigidbody;
     Animator animator;
 
     private void Awake()
     {
-        animator = gameObject.GetComponent<Animator>();
+        animator = gameObject.GetComponent<Animator>(); //for penetration ball
     }
 
     // Start is called before the first frame update
     void Start()
     {
-        if(FindObjectOfType<ChargeManager>().chargeLevel_5 == true)
+
+        if (FindObjectOfType<ChargeManager>().chargeLevel_5 == true)
         {
             maxCharge = true;
         }
         
-        //first, get component of audi and rigidbody
         audioSource = GetComponent<AudioSource>();
         rigidbody = GetComponent<Rigidbody2D>();
+        gameSession = FindObjectOfType<GameSession>();
      
-        //then, get distance btw ball and paddle
+        //calc distance btw ball and paddle
         paddleToBallVector = transform.position - paddle1.transform.position;
-     }
+       
+    }
 
-   
 
     // Update is called once per frame
     void Update()
     {
-        if (state == State.Playable)
+        if (gameSession.state == GameSession.State.title) //to avoid missing reference. IDK the reason but its nesessary!!
+        {
+            gameSession = FindObjectOfType<GameSession>();
+        }
+
+        if (gameSession.state == GameSession.State.Playable)
         {
             //before start, stick ball to paddle
             if (!hasStarted)
@@ -90,6 +97,10 @@ Main functions are:
         if(maxCharge == true)
         {
             animator.SetBool("maxCharge", true); //this "maxCharge" is param of animator controller. differes from the bool in this cs.
+        }
+        if(maxCharge == false)
+        {
+            animator.SetBool("maxCharge", false); //this "maxCharge" is param of animator controller. differes from the bool in this cs.
         }
 
     }
@@ -129,7 +140,7 @@ Main functions are:
     {
         Vector2 VelocityNormalized = rigidbody.velocity.normalized;
         rigidbody.velocity = VelocityNormalized * ballConstSpeed;
-        //TODO is this the right way to use Time.Deltatime?
+
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -146,12 +157,7 @@ Main functions are:
 
     private void VectorManager()
     {
-        //TODO Clean up!!
-
-        //first, generate randomize factor
         Vector2 velocityTweek;
-
-        //then two different ways
 
         //1. when the ball is going down, push downward(meaning, negative Y)
         if ((rigidbody.velocity.x <= 0 && rigidbody.velocity.y <=0)||
@@ -166,7 +172,6 @@ Main functions are:
             //Finally, replace velocity by "Fixed Speed" and "a little randomness"
             rigidbody.velocity = constVelocity + velocityTweek;
         }
-
 
         //2. when the ball is goind up, push upward(meaning, positive Y)
         if ((rigidbody.velocity.x >= 0 && rigidbody.velocity.y >= 0) ||

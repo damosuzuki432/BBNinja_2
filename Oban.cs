@@ -10,10 +10,23 @@ public class Oban : MonoBehaviour
 
     //showscore
     [SerializeField] GameObject showScore;
+    GameSession gameSession;
 
 
     private void Start()
     {
+        Destroy(gameObject, 10.0f); //self destruction in 10 sec. to avoid remainging forever
+        gameSession = FindObjectOfType<GameSession>();
+
+    }
+
+    private void Update()
+    {
+        if (gameSession.state == GameSession.State.title
+            || gameSession.state == GameSession.State.Special)
+        {
+            Destroy(gameObject);
+        }
 
     }
 

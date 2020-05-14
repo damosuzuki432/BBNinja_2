@@ -1,48 +1,35 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Barrier2 : MonoBehaviour
 {
-    [SerializeField] AudioClip barrierSFX;
-    int HitPoint = 1;
+    [SerializeField] GameObject barrier2;
+    Vector3 barrier2Pos;
+    public bool barrier2On = false;
 
-    private void Awake()
-    {
-        int barrier2Count = FindObjectsOfType<Barrier2>().Length;
-        if (barrier2Count > 1)
-        {
-            Destroy(gameObject);
-        }
-        else
-        {
-            DontDestroyOnLoad(gameObject);
-        }
-    }
 
     // Start is called before the first frame update
     void Start()
     {
-
+        SceneManager.activeSceneChanged += OnActiveSceneChanged;
+        barrier2Pos = new Vector3(6.2f, 1.0f, 1.0f);
     }
 
-    // Update is called once per frame
-    void Update()
+    void OnActiveSceneChanged(Scene prevScene, Scene nextScene)
     {
-
-    }
-
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        if (collision.gameObject.tag == "Ball")
+        if (barrier2On == true)
         {
-            AudioSource.PlayClipAtPoint(barrierSFX, Camera.main.transform.position);
-            HitPoint++;
-            if(HitPoint>2)
-            {
-                gameObject.SetActive(false);
-            }
+            CreateBarrier();
         }
+    }
+
+
+    public void CreateBarrier()
+    {
+        Instantiate(barrier2, barrier2Pos, transform.rotation);
+        barrier2On = true;
     }
 
 }

@@ -4,6 +4,10 @@ using UnityEngine;
 
 public class Arrow : MonoBehaviour
 {
+    /// <summary>
+    /// this is arrow, attached to arrow object.
+    /// </summary>
+
     public float yThrow = 10.0f;
 
     Rigidbody2D rigidbody;
