@@ -4,30 +4,50 @@ using UnityEngine;
 
 public class BGMFadeout : MonoBehaviour
 {
-    AudioSource audioSource;
+    public AudioSource BGM_1;
+    public AudioSource BGM_2;
     float fadeVelocity = 0.01f;
     public bool fadeOut = false;
+    public bool fadeOut2 = false;
     float oldVolume = 1.0f;
     float newVolume;
     int volume = 0;
 
 
     // Start is called before the first frame update
-    void Start()
-    {
-        audioSource = GetComponent<AudioSource>();
-     }
-
+    
     IEnumerator Fadeout()
     {
-        audioSource.volume = oldVolume;
+        BGM_1.volume = oldVolume;
         newVolume = oldVolume - Time.deltaTime* 1.0f;
-        audioSource.volume = newVolume;
+        BGM_1.volume = newVolume;
         yield return new WaitForSeconds(Time.deltaTime * 0.5f);
         oldVolume = newVolume;
     }
 
-   
+    IEnumerator Fadeout2()
+    {
+        BGM_2.volume = oldVolume;
+        newVolume = oldVolume - Time.deltaTime * 1.0f;
+        BGM_2.volume = newVolume;
+        yield return new WaitForSeconds(Time.deltaTime * 0.5f);
+        oldVolume = newVolume;
+    }
+
+    public void ResetParams()
+    {
+        oldVolume = 1.0f;
+    }
+
+    public void playDangerousBGM()
+    {
+        BGM_2.Play();
+    }
+
+    public void stopDangerousBGM()
+    {
+        BGM_2.Stop();
+    }
 
     // Update is called once per frame
     void Update()
@@ -35,6 +55,10 @@ public class BGMFadeout : MonoBehaviour
         if (fadeOut == true)
         {
             StartCoroutine(Fadeout());
+        }
+        if (fadeOut2 == true)
+        {
+            StartCoroutine(Fadeout2());
         }
 
     }

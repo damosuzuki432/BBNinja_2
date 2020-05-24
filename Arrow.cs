@@ -18,6 +18,7 @@ public class Arrow : MonoBehaviour
     {
         rigidbody = GetComponent<Rigidbody2D>();
         rigidbody.velocity = new Vector2(0, yThrow);
+        Destroy(gameObject, 5.0f);
     }
 
     private void OnCollisionEnter2D(Collision2D collision)

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.SceneManagement;
 using System;
 
 
@@ -25,7 +26,8 @@ the main funtions are:
     //Game score params
     public int score = 0;
     [SerializeField] TextMeshProUGUI scoreNum;
-
+    [SerializeField] GameObject Curtain; //used to hide gameinfo when gameover scene
+    string StageName; //to see the stage num
     //Game Debug bool
     [SerializeField] bool isAutoPlayEnabled;
     public AudioSource[] audioClip;
@@ -34,7 +36,7 @@ the main funtions are:
     bool scoreThre2 = false;
     bool scoreThre3 = false;
     bool scoreThre4 = false;
-    int threshold = 10000;
+    int threshold = 20000;
 
     paddle paddle;
 
@@ -44,12 +46,31 @@ the main funtions are:
     // Start is called before the first frame update
     void Start()
     {
+        SceneManager.activeSceneChanged += OnActiveSceneChanged;
+    }
 
+    void OnActiveSceneChanged(Scene prevScene, Scene nextScene)
+    {
+          if (gameObject != null)
+            {
+                string sceneName = SceneManager.GetActiveScene().name;
+                Curtain.SetActive(false);
+
+                if (sceneName == "GameOver")
+                {
+                    Curtain.SetActive(true);
+                }
+                else if (sceneName == "NanoLogo")
+                {
+                    Destroy(gameObject);
+                }
+            }
     }
 
 
     private void Awake()
     {
+       
         int gameSessionCount = FindObjectsOfType<GameSession>().Length;
         if (gameSessionCount > 1) // if one already exists...
         {
@@ -67,7 +88,10 @@ the main funtions are:
         //Manage Speed of the Game
         Time.timeScale = timeScale;
         //Debug.Log(score);
+        
     }
+
+    
 
     public void Score(int scorePerBreak)
     {
@@ -80,12 +104,18 @@ the main funtions are:
 
     }
 
+    public void ResetScore()
+    {
+        score = 0;
+        scoreNum.text = score.ToString();
+    }
+
     private void ScoreThreshold()
     {
         if(score > threshold)
         {
                 FindObjectOfType<LifePanel>().IncreaseLife();       
-                threshold += 10000;
+                threshold += threshold;
         }       
     }
 

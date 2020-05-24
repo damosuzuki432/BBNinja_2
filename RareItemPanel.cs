@@ -28,6 +28,9 @@ public class RareItemPanel : MonoBehaviour
             Vector2 exploPos = new Vector2(7.2f, 2.4f);
             AudioSource.PlayClipAtPoint(ExplosionSFX, Camera.main.transform.position);
             GameObject explosion = Instantiate(Rare_Explositon, exploPos, transform.rotation);
+            FindObjectOfType<LevelManager>().multiClear = true;
+            FindObjectOfType<Ball>().gameObject.SetActive(false); //inactivate ball
+            FindObjectOfType<LevelManager>().invokeClearSeq();
             DestroyAllBlocks();
             Destroy(explosion, 3.0f);
         }

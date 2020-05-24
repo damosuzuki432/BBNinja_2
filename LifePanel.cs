@@ -1,11 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 
 public class LifePanel : MonoBehaviour
 {
     public GameObject[] lifeIcons;
+    public string prevSceneName; //for reference when gameover//see SceneLoader cs.
     LoseCollider loseCollider;
     int counter = 1;
     int maxLife = 5; 
@@ -42,6 +44,8 @@ public class LifePanel : MonoBehaviour
         }
         else if (counter >= maxLife + 1)
         {
+            prevSceneName = SceneManager.GetActiveScene().name;
+            gameSession.state = GameSession.State.title;
             FindObjectOfType<SceneLoader>().Invoke("LoadGameOverScene", 2);
         }
 
@@ -66,6 +70,15 @@ public class LifePanel : MonoBehaviour
         GameObject showScoretext = Instantiate(showoneUp, paddlePos, transform.rotation);
         showScoretext.AddComponent<Rigidbody2D>().velocity = new Vector2(0, 0.5f);
         Destroy(showScoretext, 2.0f);
+    }
+
+    public void ResetLife()
+    {
+        counter = 1;
+        for (int i = 0; i<=4; i++)
+        {
+            lifeIcons[i].SetActive(true);
+        } 
     }
 
 }

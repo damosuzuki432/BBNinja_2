@@ -30,7 +30,7 @@ Main functions are:
     [SerializeField] float left = -2.0f; //tweek for left edge NOTE right is negative of this
     [SerializeField] float ballConstSpeed = 8;
 
-    public bool maxCharge = false; //penetration ball
+    //public bool maxCharge = false; //penetration ball
    
     //relationship between ball and paddle
     Vector2 ballPos; // position of the ball
@@ -55,12 +55,6 @@ Main functions are:
     // Start is called before the first frame update
     void Start()
     {
-
-        if (FindObjectOfType<ChargeManager>().chargeLevel_5 == true)
-        {
-            maxCharge = true;
-        }
-        
         audioSource = GetComponent<AudioSource>();
         rigidbody = GetComponent<Rigidbody2D>();
         gameSession = FindObjectOfType<GameSession>();
@@ -94,11 +88,11 @@ Main functions are:
             }
         }
 
-        if(maxCharge == true)
+        if(FindObjectOfType<ChargeManager>().maxCharge == true) //chargemanager.maxCharge == true
         {
             animator.SetBool("maxCharge", true); //this "maxCharge" is param of animator controller. differes from the bool in this cs.
         }
-        if(maxCharge == false)
+        if(FindObjectOfType<ChargeManager>().maxCharge == false) // same above
         {
             animator.SetBool("maxCharge", false); //this "maxCharge" is param of animator controller. differes from the bool in this cs.
         }
@@ -152,6 +146,7 @@ Main functions are:
             //if collide, make random noise 
             MakeRandomNoise();
             VectorManager();
+           
         }
     }
 

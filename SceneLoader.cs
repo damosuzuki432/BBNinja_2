@@ -10,7 +10,7 @@ public class SceneLoader : MonoBehaviour
     AudioSource audioSource;
     [SerializeField] AudioClip startSFX;
     bool avoidMultipleSound = true;
-
+  
 
     private void Start()
     {
@@ -20,10 +20,17 @@ public class SceneLoader : MonoBehaviour
 
         if (currentSceneName == "NanoLogo")
         {
-
-            Color color = Color.black;
-            Initiate.Fade("StartMenu", color, 0.5f);
+            StartCoroutine(Fadeout());
         }
+
+    }
+
+    IEnumerator Fadeout()
+    {
+        yield return new WaitForSeconds(3.0f);
+        Color color = Color.black;
+        Initiate.Fade("StartMenu", color, 0.5f);
+        yield break;
 
     }
 
@@ -42,11 +49,14 @@ public class SceneLoader : MonoBehaviour
             if (avoidMultipleSound == true)
             {
                 AudioSource.PlayClipAtPoint(startSFX, Camera.main.transform.position);
-                Invoke("LoadNextScene", 1f);
+                StartCoroutine(FindObjectOfType<OpeningManager2>().Opening());
                 avoidMultipleSound = false;
             }
         }
     }
+
+ 
+
 
     public void LoadCurrentScene()
     {
@@ -60,7 +70,6 @@ public class SceneLoader : MonoBehaviour
 
     public void LoadStartScene()
     {
-        FindObjectOfType<GameSession>().ResetGame();
         SceneManager.LoadScene(0);
     }
 
@@ -78,5 +87,39 @@ public class SceneLoader : MonoBehaviour
     {
         SceneManager.LoadScene("GameOver");
         //TODO NOTE that this is hard coded
+    }
+
+    public void Continue()
+    {
+        if (avoidMultipleSound == true)
+        {
+            AudioSource.PlayClipAtPoint(startSFX, Camera.main.transform.position);
+            Invoke("LoadPreviousScene", 2.0f);
+            avoidMultipleSound = false;
+        }
+        FindObjectOfType<LifePanel>().ResetLife();
+        FindObjectOfType<GameSession>().ResetScore();
+
+    }
+
+    public void LoadPreviousScene()
+    {
+        string chkStageName = FindObjectOfType<LifePanel>().prevSceneName.Substring(5, 1);
+        if (chkStageName == "1")
+        {
+            SceneManager.LoadScene("Stage1-1");
+        }
+        else if (chkStageName == "2")
+        {
+            SceneManager.LoadScene("Stage2-1");
+        }
+        else if (chkStageName == "3")
+        {
+            SceneManager.LoadScene("Stage3-1");
+        }
+        else if (chkStageName == "4")
+        {
+            SceneManager.LoadScene("Stage4-1");
+        }
     }
 }

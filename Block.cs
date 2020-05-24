@@ -52,6 +52,21 @@ public class Block : MonoBehaviour
         DestroyBlock();
     }
 
+    private void OnTriggerEnter2D(Collider2D collision) //for penetration ball and glass block
+    {
+
+        TriggerSFX();
+
+        //penetCount ++ if maxCharge is true. without this, glass block always adds up penet count on trigger
+        if(FindObjectOfType<ChargeManager>().maxCharge == true)
+        {
+            FindObjectOfType<ChargeManager>().penetCount++;
+            Debug.Log(FindObjectOfType<ChargeManager>().penetCount);
+        }
+
+        DestroyBlock();
+    }
+
 
     private void OnParticleCollision(GameObject other) //for fireball (when block trigger is off)
     {
@@ -61,6 +76,7 @@ public class Block : MonoBehaviour
 
     private void OnParticleTrigger() //for fireball (when block trigger is on)
     {
+        Debug.Log("trigger");
         TriggerSFX();
         DestroyBlock();
     }
@@ -202,12 +218,5 @@ public class Block : MonoBehaviour
     }
 
 
-    private void OnTriggerEnter2D(Collider2D collision) //for penetration ball and glass block
-    {
 
-        TriggerSFX();
-        DestroyBlock();
-
-        
-    }
 }

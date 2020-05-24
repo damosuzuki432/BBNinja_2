@@ -22,6 +22,8 @@ public class ChargeManager : MonoBehaviour
     public bool chargeLevel_3 = false;
     public bool chargeLevel_4 = false;
     public bool chargeLevel_5 = false;
+    public bool maxCharge = false;
+    public int penetCount = 0;
 
     // Start is called before the first frame update
     void Start()
@@ -33,11 +35,10 @@ public class ChargeManager : MonoBehaviour
     {
         if (chargeLevel_5 == true)
         {
-            FindObjectOfType<Ball>().maxCharge = true;
             PenetrateBall();
         }
-
     }
+
 
     // Update is called once per frame
     void Update()
@@ -47,7 +48,7 @@ public class ChargeManager : MonoBehaviour
 
     private void ChargeController()
     {
-        if(chargeCounter >= 1 && 2 >= chargeCounter &&
+        if(chargeCounter >= 10 && 20 >= chargeCounter &&
             chargeImage.sprite != chargeSprites[1])
         {
             chargeImage = GetComponent<Image>();
@@ -60,7 +61,7 @@ public class ChargeManager : MonoBehaviour
                 arrowGenerator.CreateArrow();
             }
         }
-        if (chargeCounter >= 3 && 4 >= chargeCounter &&
+        if (chargeCounter >= 30 && 40 >= chargeCounter &&
             chargeImage.sprite != chargeSprites[2])
         {
             chargeImage = GetComponent<Image>();
@@ -74,7 +75,7 @@ public class ChargeManager : MonoBehaviour
                 arrowGenerator.CreateArrow();
             }
         }
-        if (5 <= chargeCounter && 6 >= chargeCounter)
+        if (50 <= chargeCounter && 60 >= chargeCounter)
         {
             chargeImage = GetComponent<Image>();
             chargeImage.sprite = chargeSprites[3];
@@ -87,7 +88,7 @@ public class ChargeManager : MonoBehaviour
             }
 
         }
-        if (7 <= chargeCounter && 8 >= chargeCounter)
+        if (70 <= chargeCounter && 80 >= chargeCounter)
         {
             chargeImage = GetComponent<Image>();
             chargeImage.sprite = chargeSprites[4];
@@ -100,27 +101,38 @@ public class ChargeManager : MonoBehaviour
             }
 
         }
-        if (9 <= chargeCounter)
+        if (90 <= chargeCounter)
         {
             chargeImage = GetComponent<Image>();
             chargeImage.sprite = chargeSprites[5];
             if (chargeLevel_5 == false)
             {
                 ChargeSFX();
-                FindObjectOfType<Ball>().maxCharge = true;
+                maxCharge = true;
                 PenetrateBall();
-                StartCoroutine(StopPenetration());
                 chargeLevel_5 = true;
             }
         }
+        if(chargeLevel_5 == true)
+        {
+            StopPenetration();
+        }
+
+        StageName = SceneManager.GetActiveScene().name;
+        string chkStageName = StageName.Substring(5, 1); //see the 6th alphabet of the stagename
+        if(chkStageName == "4")
+        {
+            ResetCharge();
+        }
+
     }
 
     private void PenetrateBall()
-    {
+    {       
         blocks = GameObject.FindGameObjectsWithTag("Block");
         foreach (GameObject block in blocks)
         {
-            if (block.GetComponent<BoxCollider2D>() == null) { return; } // debug for Shogun(circle collider)
+            if (block.GetComponent<BoxCollider2D>() == null) { return; }
             block.GetComponent<BoxCollider2D>().isTrigger = true;
         }
     }
@@ -133,10 +145,10 @@ public class ChargeManager : MonoBehaviour
 
     public void ChargeCountAccumulator()
     {
-        //Activated only from stage 2
+        //Activated from stage 2
         StageName = SceneManager.GetActiveScene().name;
         string chkStageName = StageName.Substring(5, 1); //see the 6th alphabet of the stagename
-        if (chkStageName != "1")
+        if (chkStageName != "1" && chkStageName != "4")
         {
             GameSession gameSession = FindObjectOfType<GameSession>();
             if(gameSession.state == GameSession.State.Playable)
@@ -144,44 +156,47 @@ public class ChargeManager : MonoBehaviour
                 chargeCounter++; //accumulate only when state is playable. without this, charge occurs After losing ball when shuriken breaks blocks.
             }
         }
+        
+
     }
 
-    IEnumerator StopPenetration()
+    private void StopPenetration()
     {
-        yield return new WaitForSeconds(5.0f);
-        if (FindObjectOfType<Ball>() == null)// for the case when the ball is missing since scene transition!
-           {
-            //TODO if state == dying, yield break here.
-            //TODO if state == title, meaning scene transition, let's wait till(loop) scene == playable.
-            //TODO if in 7sec Ball is still null, try again after 1 sec. to go on.
-             yield return new WaitForSeconds(7.0f);
-           }
+        if(penetCount > 30)
+        {
+            chargeLevel_5 = false;
+            maxCharge = false;
 
-           FindObjectOfType<Ball>().maxCharge = false;
-           blocks = GameObject.FindGameObjectsWithTag("Block");
-           chargeLevel_5 = false;
-           chargeImage = GetComponent<Image>();
-           chargeImage.sprite = chargeSprites[4];
-           chargeCounter = 7;
-           foreach (GameObject block in blocks)
+            chargeImage = GetComponent<Image>();
+            chargeImage.sprite = chargeSprites[4];
+
+            chargeCounter = 71;
+            penetCount = 0;
+
+            blocks = GameObject.FindGameObjectsWithTag("Block");
+            foreach (GameObject block in blocks)
             {
+                if(block == null)
+                {
+                    break;
+                }
+
                 string gameObjectName = block.name;
                 if (block.name.Contains("GR"))
                 {
                     continue; //debug for glass block
                 }
-                if (block.GetComponent<BoxCollider2D>() == null)
-                {
-                    continue; // debug for Shogun(circle collider)
-                }
-              block.GetComponent<BoxCollider2D>().isTrigger = false;
+
+                block.GetComponent<BoxCollider2D>().isTrigger = false;
             }
-        yield break;
+        }
     }
 
     public void ResetCharge()
     {
         chargeCounter = 0;
+        penetCount = 0;
+        maxCharge = false;
         chargeLevel_1 = false;
         chargeLevel_2 = false;
         chargeLevel_3 = false;

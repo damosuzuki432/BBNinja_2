@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Shogun : MonoBehaviour
 {
-    int hitPoint = 2;
+    int hitPoint = 33;
     [Range(0.1f, 0.5f)] [SerializeField] float blinkSpeed = 0.2f;
     Vector3 centerPos = new Vector3(7, 9, 0);
     bool act2 = false;
@@ -29,6 +29,7 @@ public class Shogun : MonoBehaviour
     [SerializeField] GameObject dieParticle;
     [SerializeField] Sprite shogunFaceAct2;
     [SerializeField] Sprite shogunFaceAct3;
+    bool multiClear = false;
 
     Ball ball;
     LevelManager levelManager;
@@ -44,17 +45,31 @@ public class Shogun : MonoBehaviour
 
     private void Update()
     {
+        //watch hit point to proceed next Act
         if (hitPoint <= 30 && act2 ==false)
         {
+            DestroyAllBlocks();
             StartCoroutine(ShogunAct2());
             act2 = true;
         }
         if (hitPoint <= 10 && act3 == false)
         {
+            DestroyAllBlocks();
             StartCoroutine(ShogunAct3());
             act3 = true;
         }
-     
+        if (hitPoint <= 0)
+        {
+            randomM = false;
+            StopCoroutine(RandomMove());
+            if(multiClear == false)
+            {
+                multiClear = true;
+                StartCoroutine(StartClearSequence());
+            }
+        }
+
+
     }
 
 
@@ -114,13 +129,8 @@ public class Shogun : MonoBehaviour
         hitPoint--;
         StartBlinking();
         AudioSource.PlayClipAtPoint(damageNoise, Camera.main.transform.position);
-        if (hitPoint <= 0)
-        {
-            randomM = false;
-            StopCoroutine(RandomMove());
-            StartCoroutine(StartClearSequence());
-        }
-    }
+       }
+
 
     IEnumerator Blink()
     {
@@ -204,9 +214,30 @@ public class Shogun : MonoBehaviour
 
     IEnumerator StartClearSequence()
     {
+        SpriteRenderer sp = gameObject.GetComponent<SpriteRenderer>();
+        sp.enabled = false;
+
         Instantiate(dieParticle, transform.position, transform.rotation);
         AudioSource.PlayClipAtPoint(dieNoise, Camera.main.transform.position);
-        Destroy(gameObject);
+
+        DestroyAllBlocks();
+
+        gameSession = FindObjectOfType<GameSession>();
+        gameSession.gameObject.SetActive(false);
+        ball = FindObjectOfType<Ball>();
+        ball.gameObject.SetActive(false);
+
+        FindObjectOfType<BGMmanager>().BGM_Stage4.Stop();
+        yield return new WaitForSeconds(7f);
+        FindObjectOfType<BGMmanager>().BGM_Stage5.Play();
+        yield return new WaitForSeconds(1.5f);
+        FindObjectOfType<SceneLoader>().LoadNextScene();
+
+        yield break;
+    }
+
+    private void DestroyAllBlocks()
+    {
         blocks = GameObject.FindGameObjectsWithTag("Block");
         foreach (GameObject block in blocks)
         {
@@ -218,8 +249,5 @@ public class Shogun : MonoBehaviour
         {
             Destroy(ojama);
         }
-        yield break;
-        
     }
-
 }

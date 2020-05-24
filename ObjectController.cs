@@ -10,24 +10,31 @@ public class ObjectController : MonoBehaviour
     [SerializeField] GameObject Shogun;
     [SerializeField] GameObject help;
     Animator animator;
-        
 
-    public bool ShogunFall = true;
-
+    public float speed = 10.0f;
+    public bool walkLeft;
+    public bool walkRight;
 
     private void Awake()
     {
         animator = Ninja.GetComponent<Animator>();
     }
 
-    // Start is called before the first frame update
-    void Start()
+    private void FixedUpdate()
     {
-        
+        if (walkLeft == true)
+        {
+            Ninja.transform.Translate(-speed / 50, 0, 0);
+        }
+        if (walkRight == true)
+        {
+            Ninja.transform.Translate(speed / 50, 0, 0);
+        }
+
     }
 
-    // Update is called once per frame
-    
+
+
 
     public void DisapperPrincess()
     {
@@ -52,6 +59,28 @@ public class ObjectController : MonoBehaviour
     public void CalmNinja()
     {
         animator.SetBool("GetAngry", false);
+        animator.SetBool("Walk", false);
+        animator.SetBool("Paddle", false);
+    }
+
+    public void WalkNinja()
+    {
+        animator.SetBool("Walk", true);
+    }
+
+    public void PaddleNinja()
+    {
+        animator.SetBool("Paddle", true);
+    }
+
+    public void PaddleIdleNinja()
+    {
+        animator.SetBool("PaddleIdle", true);
+    }
+
+    public void PaddleUnIdleNinja()
+    {
+        animator.SetBool("PaddleIdle", false);
     }
 
 
@@ -64,6 +93,11 @@ public class ObjectController : MonoBehaviour
     {
         Ninja.GetComponent<SpriteRenderer>().flipX = true;
     }
+    public void NinjaUnFlipHolizontal()
+    {
+        Ninja.GetComponent<SpriteRenderer>().flipX = false;
+    }
+
 
     public void NinjaMoveRight()
     {

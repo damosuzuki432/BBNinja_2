@@ -16,13 +16,14 @@ public class BGMmanager : MonoBehaviour
     public AudioSource BGM_Stage3;
     public AudioSource BGM_Stage4;
     public AudioSource BGM_Stage5;
+    public AudioSource BGM_GameOver;
 
     private string previousScene = "Stage1-9"; //the name of the previous scene
 
     private void Awake()
     {
         int bgmManagerCount = FindObjectsOfType<BGMmanager>().Length;
-        if (bgmManagerCount > 1)
+        if (bgmManagerCount > 1 )
         {
             Destroy(gameObject);
         }
@@ -75,32 +76,57 @@ public class BGMmanager : MonoBehaviour
 
     void OnActiveSceneChanged(Scene prevScene, Scene nextScene)
     {
-        //BGM_stage1 is play on awake, so it has to stop when scene is other than stage1-x.
+        Debug.Log("error1");
+        if (gameObject != null) 
+        {
+            if (nextScene.name == "Stage1-1")
+            {
+                if (BGM_Stage1.isPlaying) { return; }
+                BGM_GameOver.Stop();
+                BGM_Stage1.Play();
+            }
+            else if (nextScene.name == "Stage2-1")
+            {
+                if (BGM_Stage2.isPlaying) { return; }
+                BGM_GameOver.Stop();
+                BGM_Stage1.Stop();
+                BGM_Stage2.Play();
+            }
+            else if (nextScene.name == "Stage3-1")
+            {
+                if (BGM_Stage3.isPlaying) { return; }
+                BGM_GameOver.Stop();
+                BGM_Stage2.Stop();
+                BGM_Stage3.Play();
+            }
+            else if (nextScene.name == "Stage4-1")
+            {
+                if (BGM_Stage4.isPlaying) { return; }
+                BGM_GameOver.Stop();
+                BGM_Stage3.Stop();
+                BGM_Stage4.Play();
+            }
+            else if (nextScene.name == "Stage5-1")
+            {
+                if (BGM_Stage5.isPlaying) { return; }
+                BGM_Stage4.Stop();
+                BGM_Stage5.Play();
+            }
+            else if (nextScene.name == "GameOver")
+            {
+                BGM_Stage1.Stop();
+                BGM_Stage2.Stop();
+                BGM_Stage3.Stop();
+                BGM_Stage4.Stop();
+                BGM_GameOver.Play();
+            }
+            else if (nextScene.name == "NanoLogo")
+            {
+                Destroy(gameObject);
+            }
+        }
 
-        if (nextScene.name == "Stage2-1")
-        {
-            if (BGM_Stage2.isPlaying) { return; }
-            BGM_Stage1.Stop();
-            BGM_Stage2.Play();
-        }
-        else if (nextScene.name == "Stage3-1")
-        {
-            if (BGM_Stage3.isPlaying) { return; }
-            BGM_Stage2.Stop();
-            BGM_Stage3.Play();
-        }
-        else if (nextScene.name == "Stage4-1")
-        {
-            if (BGM_Stage4.isPlaying) { return; }
-            BGM_Stage3.Stop();
-            BGM_Stage4.Play();
-        }
-        else if (nextScene.name == "Stage5-1")
-        {
-            if (BGM_Stage5.isPlaying) { return; }
-            BGM_Stage4.Stop();
-            BGM_Stage5.Play();
-        }
+      
     }
    
 }

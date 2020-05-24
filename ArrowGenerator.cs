@@ -37,6 +37,7 @@ public class ArrowGenerator : MonoBehaviour
     private void Update()
     {
         //always calclate the position of paddle.
+        if (paddle == null) { return; }
         rightPos = new Vector2(paddle.transform.position.x + 1,
                                paddle.transform.position.y + 1);
         leftPos  = new Vector2(paddle.transform.position.x - 1,
@@ -57,6 +58,14 @@ public class ArrowGenerator : MonoBehaviour
         {
             while (chargeManager.chargeLevel_1 == true)
             {
+                //if boss stage, dont launch
+                string StageName = SceneManager.GetActiveScene().name;
+                string chkStageName = StageName.Substring(5, 1); //see the 6th alphabet of the stagename
+                if (chkStageName == "4") 
+                {
+                    yield break;
+                }
+
                 yield return new WaitForSeconds(4.0f);
                 Launch();
             }
@@ -72,8 +81,25 @@ public class ArrowGenerator : MonoBehaviour
         {
             while (chargeManager.chargeLevel_2 == true)
             {
+                //if boss stage, dont launch
+                string StageName = SceneManager.GetActiveScene().name;
+                string chkStageName = StageName.Substring(5, 1); //see the 6th alphabet of the stagename
+                if (chkStageName == "4") //if boss stage, dont launch
+                {
+                    yield break;
+                }
+
                 yield return new WaitForSeconds(3.0f);
                 Launch();
+
+                //if boss stage, dont launch
+                StageName = SceneManager.GetActiveScene().name;
+                chkStageName = StageName.Substring(5, 1); //see the 6th alphabet of the stagename
+                if (chkStageName == "4") //if boss stage, dont launch
+                {
+                    yield break;
+                }
+
                 yield return new WaitForSeconds(0.5f);
                 Launch();
             }
@@ -84,20 +110,6 @@ public class ArrowGenerator : MonoBehaviour
             //stop while loop 
             yield break;
         }
-
-
-        //while (chargeManager.chargeLevel_2 == true) //TODO delete
-        //{
-        //    yield return new WaitForSeconds(3.0f);
-        //    Launch();
-        //    yield return new WaitForSeconds(0.5f);
-        //    Launch();
-        //}
-        //if (chargeManager.chargeLevel_2 == false)
-        //{
-        //    //stop while loop
-        //    yield break;
-        //}
 
     }
 

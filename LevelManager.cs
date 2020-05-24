@@ -24,17 +24,25 @@ the main funtions are:
     bool multiDeath = false;
 
     //use to avoid multiple clear at Update method
-    bool multiClear = false;
+    public bool multiClear = false;  //refered by Rareitem
 
     public int reqdNumBlock;
     [SerializeField] TextMeshProUGUI reqdBlocks;
+    [SerializeField] TextMeshProUGUI okText;
     [SerializeField] GameObject clearImage;
+    [SerializeField] GameObject normalClearImage;
     [SerializeField] GameObject stageReadyPanel;
+    [SerializeField] GameObject timeUpImage;
     [SerializeField] AudioSource backGroundMusic; // destroy when cleared
     [SerializeField] AudioClip clearJingle; // to play when cleared
+    [SerializeField] AudioClip reqZeroJingle; // to play when reqd = zero
     [SerializeField]float reqdRatio = 0.8f;
 
+    bool reqZero = false;
+    string stgName;
+
     AudioSource audioSource;
+
 
     Ball ball;
     timerText timerText;
@@ -45,6 +53,7 @@ the main funtions are:
         ball = FindObjectOfType<Ball>();
         timerText = FindObjectOfType<timerText>();
         gameSession = FindObjectOfType<GameSession>();
+        stgName = SceneManager.GetActiveScene().name;
         CheckNumOfBlocks("Block"); //TODO NOTE that the tag is hard coded
         ShowRequiredBlocks();
         Invoke("StageReady", 2.0f);
@@ -75,27 +84,38 @@ the main funtions are:
     void Update()
     {
         CheckNumOfBlocks("Block");
-        LoadingManager();
+        if (stgName != "Stage4-1") { LoadingManager(); }
     }
 
     private void LoadingManager() 
     {
         numblockObject = numblockObjects.Length;
-        if (numblockObject == 0)
+        if(reqdNumBlock == 0)
+        {
+            if(reqZero == false) //show OK sign
+            {
+                if (reqZeroJingle == null) { return; }
+                else
+                {
+                    AudioSource.PlayClipAtPoint(reqZeroJingle, Camera.main.transform.position);
+                    reqdBlocks.enabled = false;
+                    okText.gameObject.SetActive(true);
+                    reqZero = true;
+                }
+            }
+        }
+
+        if (numblockObject == 0) 
         {
             if (multiClear == true) {return;}
-            if (gameSession.state == GameSession.State.Special)//if state == special, wait for a while till the VFX finsh to start StartClearSequence
-            {
-                ball.gameObject.SetActive(false); //inactivate ball
-                Invoke("StartClearSequence", 3.0f);
-            }
+           
             else
             {
                 StartClearSequence();
             }
         }
 
-        if (reqdNumBlock == 0　&& timerText.seconds < 0)
+        if (reqdNumBlock == 0　&& timerText.seconds < 0) 
         {
             if (multiClear == true) {return;}
             StartClearSequence();
@@ -112,63 +132,54 @@ the main funtions are:
 
     private void StartDeathSequence()
     {
+        timeUpImage.SetActive(true);
         ball.gameObject.SetActive(false); //inactivate ball
         FindObjectOfType<LifePanel>().DecraeseLife();
         FindObjectOfType<GameSession>().ToTitleState();
         FindObjectOfType<ChargeManager>().ResetCharge();
         multiDeath = true;
-        //gameSession.state = GameSession.State.title;
+
     }
 
-    private void StartClearSequence()
+    public void invokeClearSeq()//called by rareitem
+    {
+        Invoke("StartClearSequence", 3.0f);
+    }
+
+    private void StartClearSequence() 
     {
 
         FindObjectOfType<GameSession>().ToTitleState();
         ball.gameObject.SetActive(false); //inactivate ball
-        clearImage.SetActive(true); //show clear image
         multiClear = true; //prevent multiple clear seq
+
+       
+
+        //show clear image depending on scene number 
         string StageName = SceneManager.GetActiveScene().name;
         if(StageName == "Stage4-1")
         {
-
-            GameClear();
+            //GameClear();
         }
+
         else if (StageName == "Stage1-9" || StageName == "Stage2-9"|| StageName == "Stage3-9")
         {
             ClearSection();
         }
-        //TODO stop time
-        //TODO show button to next stage
-        //TODO below is temporary
-        else
+
+        else if (numblockObject == 0)
         {
-
+            clearImage.SetActive(true); //show perfect clear image
             Invoke("LoadNextScene", 2.0f);
+
         }
-    }
+        else if (numblockObject != 0)
+        {
+            normalClearImage.SetActive(true);
+            Invoke("LoadNextScene", 2.0f);
 
-    private void GameClear()
-    {
+        }
 
-        gameSession = FindObjectOfType<GameSession>();
-        gameSession.gameObject.SetActive(false);
-
-        
-        StartCoroutine(ToEnding());
-        
-
-    }
-
-    IEnumerator ToEnding()
-    {
-        FindObjectOfType<BGMmanager>().BGM_Stage4.Stop();
-       
-        yield return new WaitForSeconds(7f);
-       
-        FindObjectOfType<BGMmanager>().BGM_Stage5.Play();
-        yield return new WaitForSeconds(1.5f);
-        FindObjectOfType<SceneLoader>().LoadNextScene();
-        yield break;
     }
 
     private void ClearSection()
@@ -177,6 +188,7 @@ the main funtions are:
         FindObjectOfType<BGMmanager>().BGM_Stage2.Stop();
         FindObjectOfType<BGMmanager>().BGM_Stage3.Stop();
         AudioSource.PlayClipAtPoint(clearJingle, Camera.main.transform.position); //play clear jingle
+        clearImage.SetActive(true);
         Invoke("LoadNextScene", 4.0f);
     }
 
