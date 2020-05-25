@@ -22,6 +22,7 @@ public class timerText : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+   // if(gamesession.state == gamesession.state.playable)// add this part and reference at start
         if (ball.hasStarted)
         {
             seconds -= Time.deltaTime;
