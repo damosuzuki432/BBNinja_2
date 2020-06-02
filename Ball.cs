@@ -114,14 +114,18 @@ Main functions are:
     private void LaunchOnMouseClick()
     {
         //start by left click. Note 0 means left click of a mouse button
-        if (Input.GetMouseButtonDown(0))
+        if (Time.timeScale <= Mathf.Epsilon) { return; } //exit when pause 
+        else
         {
-            //turn on hasstarted switch
-            hasStarted = true;
-            //replace velocity property to move ball upward (this is the first shot)
-            rigidbody.velocity = new Vector2(xThrow, yThrow);
-            //turn off release enabler so that player no longer can release ball upward
-            ReleaseEnabler = false;
+            if (Input.GetMouseButtonDown(0))
+            {
+                //turn on hasstarted switch
+                hasStarted = true;
+                //replace velocity property to move ball upward (this is the first shot)
+                rigidbody.velocity = new Vector2(xThrow, yThrow);
+                //turn off release enabler so that player no longer can release ball upward
+                ReleaseEnabler = false;
+            }
         }
     }
 

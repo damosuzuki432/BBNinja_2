@@ -130,7 +130,7 @@ the main funtions are:
         }
     }
 
-    private void StartDeathSequence()
+    public void StartDeathSequence()
     {
         timeUpImage.SetActive(true);
         ball.gameObject.SetActive(false); //inactivate ball

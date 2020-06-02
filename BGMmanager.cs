@@ -76,37 +76,38 @@ public class BGMmanager : MonoBehaviour
 
     void OnActiveSceneChanged(Scene prevScene, Scene nextScene)
     {
-        Debug.Log("error1");
+        StageName = SceneManager.GetActiveScene().name;
+        string chkStageName = StageName.Substring(5, 1);
         if (gameObject != null) 
         {
-            if (nextScene.name == "Stage1-1")
+            if (chkStageName == "1")
             {
                 if (BGM_Stage1.isPlaying) { return; }
                 BGM_GameOver.Stop();
                 BGM_Stage1.Play();
             }
-            else if (nextScene.name == "Stage2-1")
+            else if (chkStageName == "2")
             {
                 if (BGM_Stage2.isPlaying) { return; }
                 BGM_GameOver.Stop();
                 BGM_Stage1.Stop();
                 BGM_Stage2.Play();
             }
-            else if (nextScene.name == "Stage3-1")
+            else if (chkStageName == "3")
             {
                 if (BGM_Stage3.isPlaying) { return; }
                 BGM_GameOver.Stop();
                 BGM_Stage2.Stop();
                 BGM_Stage3.Play();
             }
-            else if (nextScene.name == "Stage4-1")
+            else if (chkStageName == "4")
             {
                 if (BGM_Stage4.isPlaying) { return; }
                 BGM_GameOver.Stop();
                 BGM_Stage3.Stop();
                 BGM_Stage4.Play();
             }
-            else if (nextScene.name == "Stage5-1")
+            else if (chkStageName == "5")
             {
                 if (BGM_Stage5.isPlaying) { return; }
                 BGM_Stage4.Stop();

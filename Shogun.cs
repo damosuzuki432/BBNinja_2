@@ -16,6 +16,7 @@ public class Shogun : MonoBehaviour
     SpriteRenderer spriterenderer;
     GameObject[] blocks;
     GameObject[] ojamas;
+    GameObject[] shuriken;
     [SerializeField] AudioClip shoutNoise;
     [SerializeField] AudioClip damageNoise;
     [SerializeField] AudioClip blockCreateNoise;
@@ -27,14 +28,19 @@ public class Shogun : MonoBehaviour
     [SerializeField] GameObject act3Blocks;
     [SerializeField] GameObject defeatParticle;
     [SerializeField] GameObject dieParticle;
+    [SerializeField] GameObject onibi;
     [SerializeField] Sprite shogunFaceAct2;
     [SerializeField] Sprite shogunFaceAct3;
+    [SerializeField] GameObject shokudai_left;
+    [SerializeField] GameObject shokudai_right;
+
     bool multiClear = false;
 
     Ball ball;
     LevelManager levelManager;
     GameSession gameSession;
     BGMmanager bGMmanager;
+    AutoShurikenGenerator autoS;
 
     // Start is called before the first frame update
     void Start()
@@ -52,7 +58,7 @@ public class Shogun : MonoBehaviour
             StartCoroutine(ShogunAct2());
             act2 = true;
         }
-        if (hitPoint <= 10 && act3 == false)
+        if (hitPoint <= 29 && act3 == false)
         {
             DestroyAllBlocks();
             StartCoroutine(ShogunAct3());
@@ -167,24 +173,39 @@ public class Shogun : MonoBehaviour
             yield return new WaitForSeconds(0.5f);
             gameObject.transform.Translate(1, 0, 0); // right
             AudioSource.PlayClipAtPoint(moveNoise, Camera.main.transform.position);
+
             yield return new WaitForSeconds(0.5f);
             gameObject.transform.Translate(1, 0, 0); //right
+
             AudioSource.PlayClipAtPoint(moveNoise, Camera.main.transform.position);
+            GameObject onibiAttack = Instantiate(onibi, shokudai_left.transform.position, transform.rotation);
+            onibiAttack.GetComponent<Rigidbody2D>().velocity = new Vector2(0, -3);
+            Destroy(onibiAttack, 10.0f);
+
             yield return new WaitForSeconds(0.5f);
             gameObject.transform.Translate(-1, 0, 0); //left
             AudioSource.PlayClipAtPoint(moveNoise, Camera.main.transform.position);
+            
             yield return new WaitForSeconds(0.5f);
             gameObject.transform.Translate(-1, 0, 0); //left(back to center)
             AudioSource.PlayClipAtPoint(moveNoise, Camera.main.transform.position);
+
             yield return new WaitForSeconds(0.5f);
             gameObject.transform.Translate(-1, 0, 0); //left
             AudioSource.PlayClipAtPoint(moveNoise, Camera.main.transform.position);
+
             yield return new WaitForSeconds(0.5f);
             gameObject.transform.Translate(-1, 0, 0); //left
+
+            onibiAttack = Instantiate(onibi, shokudai_right.transform.position, transform.rotation);
+            onibiAttack.GetComponent<Rigidbody2D>().velocity = new Vector2(0, -3);
+            Destroy(onibiAttack, 10.0f);
             AudioSource.PlayClipAtPoint(moveNoise, Camera.main.transform.position);
+
             yield return new WaitForSeconds(0.5f);
             gameObject.transform.Translate(1, 0, 0); //right
             AudioSource.PlayClipAtPoint(moveNoise, Camera.main.transform.position);
+
             yield return new WaitForSeconds(0.5f);
             gameObject.transform.Translate(1, 0, 0); // right(back to center)
             AudioSource.PlayClipAtPoint(moveNoise, Camera.main.transform.position);
@@ -200,9 +221,12 @@ public class Shogun : MonoBehaviour
             float randomX = Random.Range(4.5f, 9.2f);
             float randomY = Random.Range(7.3f, 10.0f);
             Vector3 randomPos = new Vector3(randomX, randomY, 0);
+          
             currentPos = randomPos;
             gameObject.transform.position = currentPos;
-            
+
+
+
             AudioSource.PlayClipAtPoint(moveNoise, Camera.main.transform.position);
             yield return new WaitForSeconds(0.5f);
 
@@ -216,6 +240,8 @@ public class Shogun : MonoBehaviour
     {
         SpriteRenderer sp = gameObject.GetComponent<SpriteRenderer>();
         sp.enabled = false;
+        CircleCollider2D cc = gameObject.GetComponent<CircleCollider2D>();
+        cc.enabled = false;
 
         Instantiate(dieParticle, transform.position, transform.rotation);
         AudioSource.PlayClipAtPoint(dieNoise, Camera.main.transform.position);
@@ -224,8 +250,12 @@ public class Shogun : MonoBehaviour
 
         gameSession = FindObjectOfType<GameSession>();
         gameSession.gameObject.SetActive(false);
+
         ball = FindObjectOfType<Ball>();
         ball.gameObject.SetActive(false);
+
+        autoS = FindObjectOfType<AutoShurikenGenerator>();
+        autoS.generator = false;
 
         FindObjectOfType<BGMmanager>().BGM_Stage4.Stop();
         yield return new WaitForSeconds(7f);
@@ -249,5 +279,13 @@ public class Shogun : MonoBehaviour
         {
             Destroy(ojama);
         }
+
+        shuriken = GameObject.FindGameObjectsWithTag("Shuriken");
+        foreach (GameObject shu in shuriken )
+        {
+            Destroy(shu);
+        }
     }
+
+
 }

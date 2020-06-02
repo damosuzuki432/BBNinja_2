@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class ShurikenItem : MonoBehaviour
 {
-    [SerializeField]GameObject Shuriken;
+    [SerializeField] GameObject Shuriken;
     paddle paddle;
-    [SerializeField]AudioClip powerUpSound;
+    [SerializeField] AudioClip powerUpSound;
     float distance = 0.6f; //y distance btw paddle to instantiate
     // Start is called before the first frame update
     GameSession gameSession;
@@ -21,8 +21,9 @@ public class ShurikenItem : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (gameSession.state == GameSession.State.title
-       || gameSession.state == GameSession.State.Special)
+        if (gameSession == null
+            ||gameSession.state == GameSession.State.title
+            || gameSession.state == GameSession.State.Special)
         {
             Destroy(gameObject);
         }

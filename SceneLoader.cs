@@ -104,22 +104,23 @@ public class SceneLoader : MonoBehaviour
 
     public void LoadPreviousScene()
     {
-        string chkStageName = FindObjectOfType<LifePanel>().prevSceneName.Substring(5, 1);
-        if (chkStageName == "1")
-        {
-            SceneManager.LoadScene("Stage1-1");
-        }
-        else if (chkStageName == "2")
-        {
-            SceneManager.LoadScene("Stage2-1");
-        }
-        else if (chkStageName == "3")
-        {
-            SceneManager.LoadScene("Stage3-1");
-        }
-        else if (chkStageName == "4")
-        {
-            SceneManager.LoadScene("Stage4-1");
-        }
+        SceneManager.LoadScene(FindObjectOfType<LifePanel>().prevSceneName);
+        //string chkStageName = FindObjectOfType<LifePanel>().prevSceneName.Substring(5, 1);
+        //if (chkStageName == "1")
+        //{
+        //    SceneManager.LoadScene("Stage1-1");
+        //}
+        //else if (chkStageName == "2")
+        //{
+        //    SceneManager.LoadScene("Stage2-1");
+        //}
+        //else if (chkStageName == "3")
+        //{
+        //    SceneManager.LoadScene("Stage3-1");
+        //}
+        //else if (chkStageName == "4")
+        //{
+        //    SceneManager.LoadScene("Stage4-1");
+        //}
     }
 }

@@ -8,25 +8,28 @@ using System;
 
 public class GameSession : MonoBehaviour
 {
-/*
-This is attached to "GameSession".
-the main funtions are:
- 1. control game speed. you can either increase/decrease the entire speed of the game.
- 2. manage scoreborad. It is called by block class because these two are closely related.
- 3. TODO manage BGM of the game.
- 4. 1,2,3 must be maintained through the entire gamesession, so the concept of Singlton comes in.
-    that is why you see Dont Destroy on Load below.
-    if you need one thing, such as score, music, etc, and want to use it throuhg entire game,
-    lets get it together in ONE class like below.   
- */
+    /*
+    This is attached to "GameSession".
+    the main funtions are:
+     1. control game speed. you can either increase/decrease the entire speed of the game.
+     2. manage scoreborad. It is called by block class because these two are closely related.
+     3. TODO manage BGM of the game.
+     4. 1,2,3 must be maintained through the entire gamesession, so the concept of Singlton comes in.
+        that is why you see Dont Destroy on Load below.
+        if you need one thing, such as score, music, etc, and want to use it throuhg entire game,
+        lets get it together in ONE class like below.   
+     */
 
     //Game speed params
-    [Range(0f,10f)][SerializeField] float timeScale = 1.0f;
+    [Range(0f, 10f)] [SerializeField] float timeScale = 1.0f;
 
     //Game score params
     public int score = 0;
     [SerializeField] TextMeshProUGUI scoreNum;
     [SerializeField] GameObject Curtain; //used to hide gameinfo when gameover scene
+    [SerializeField] GameObject PausePanel;
+    [SerializeField] GameObject AreYouSurePanel;
+
     string StageName; //to see the stage num
     //Game Debug bool
     [SerializeField] bool isAutoPlayEnabled;
@@ -51,26 +54,26 @@ the main funtions are:
 
     void OnActiveSceneChanged(Scene prevScene, Scene nextScene)
     {
-          if (gameObject != null)
-            {
-                string sceneName = SceneManager.GetActiveScene().name;
-                Curtain.SetActive(false);
+        if (gameObject != null)
+        {
+            string sceneName = SceneManager.GetActiveScene().name;
+            Curtain.SetActive(false);
 
-                if (sceneName == "GameOver")
-                {
-                    Curtain.SetActive(true);
-                }
-                else if (sceneName == "NanoLogo")
-                {
-                    Destroy(gameObject);
-                }
+            if (sceneName == "GameOver")
+            {
+                Curtain.SetActive(true);
             }
+            else if (sceneName == "NanoLogo")
+            {
+                Destroy(gameObject);
+            }
+        }
     }
 
 
     private void Awake()
     {
-       
+
         int gameSessionCount = FindObjectsOfType<GameSession>().Length;
         if (gameSessionCount > 1) // if one already exists...
         {
@@ -87,17 +90,21 @@ the main funtions are:
     {
         //Manage Speed of the Game
         Time.timeScale = timeScale;
-        //Debug.Log(score);
-        
+
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            timeScale = 0f;
+            PausePanel.SetActive(true);
+        }
     }
 
-    
+
 
     public void Score(int scorePerBreak)
     {
         //get accumurated score
         score += scorePerBreak;
-        
+
         //display score on scoreNumtext;
         scoreNum.text = score.ToString();
         ScoreThreshold();
@@ -112,11 +119,11 @@ the main funtions are:
 
     private void ScoreThreshold()
     {
-        if(score > threshold)
+        if (score > threshold)
         {
-                FindObjectOfType<LifePanel>().IncreaseLife();       
-                threshold += threshold;
-        }       
+            FindObjectOfType<LifePanel>().IncreaseLife();
+            threshold += 20000;
+        }
     }
 
     public void ResetGame()
@@ -129,9 +136,7 @@ the main funtions are:
         return isAutoPlayEnabled;
     }
 
-    
-    //TODO　シーンの切り替え時　title
-    //TODO ２秒後　playable
+
     public void ToTitleState()
     {
         state = GameSession.State.title;
@@ -141,6 +146,24 @@ the main funtions are:
         state = GameSession.State.Playable;
     }
 
+    //when click on to title button
+    public void Sure()
+    {
+        PausePanel.SetActive(false);
+        AreYouSurePanel.SetActive(true);
+    }
+    public void LoadStartScene()
+    {
+        // if yes
+        SceneManager.LoadScene(0);
+    }
+    //when click on resume button
+    public void Resume()
+    {
+        timeScale = 1.0f;
+        PausePanel.SetActive(false);
+        AreYouSurePanel.SetActive(false);
+    }
 
 
 }

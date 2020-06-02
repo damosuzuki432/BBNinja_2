@@ -28,7 +28,7 @@ Main functions are:
     //cache out reference
     Ball ball;
     GameSession gamesession;
-
+    Animator animator;
 
 
     // Start is called before the first frame update
@@ -36,7 +36,8 @@ Main functions are:
     {
         ball = FindObjectOfType<Ball>();
         gamesession = FindObjectOfType<GameSession>();
-      
+        animator = gameObject.GetComponent<Animator>(); 
+
     }
 
 
@@ -49,14 +50,19 @@ Main functions are:
         }
         if (gamesession.state == GameSession.State.Playable)
         {
-            //the paddle moved along with the mouse Xpos.
-            //the mouse pos is dependent on screen with and witdth in units.
-            //here is the formula to convert.
-            ScreenWidthInUnits = Camera.main.orthographicSize * 2;
-            ClampedMousePosInUnits = Mathf.Clamp(GetXpos(), minX, maxX);
-            paddlePos = new Vector2(ClampedMousePosInUnits, fixedYpos);
-            transform.position = paddlePos;
-            
+            if (animator.GetBool("panic") == true || Time.timeScale <= Mathf.Epsilon) { return; } //panic is set by trap such as onibi. while panic, paddle cannnot be moved.
+            //or , when timescale is 0, (done so by pause script), paddle cannot be moved.
+            else
+            {
+                //the paddle moved along with the mouse Xpos.
+                //the mouse pos is dependent on screen with and witdth in units.
+                //here is the formula to convert.
+                ScreenWidthInUnits = Camera.main.orthographicSize * 2;
+                ClampedMousePosInUnits = Mathf.Clamp(GetXpos(), minX, maxX);
+                paddlePos = new Vector2(ClampedMousePosInUnits, fixedYpos);
+                transform.position = paddlePos;
+            }
+
         }
        
     }

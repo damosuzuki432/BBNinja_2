@@ -13,9 +13,11 @@ public class Addlife : MonoBehaviour
 
     LifePanel lifePanel;
     paddle paddle;
+    GameSession gameSession;
 
     private void Start()
     {
+        gameSession = FindObjectOfType<GameSession>();
         Destroy(gameObject, 10.0f); //self destruction in 10 sec. to avoid remainging forever
     }
 
@@ -26,6 +28,15 @@ public class Addlife : MonoBehaviour
         {
             lifePanel = FindObjectOfType<LifePanel>();
             lifePanel.IncreaseLife();
+            Destroy(gameObject);
+        }
+
+    }
+    private void Update()
+    {
+        if (gameSession.state == GameSession.State.title
+            || gameSession.state == GameSession.State.Special)
+        {
             Destroy(gameObject);
         }
 
