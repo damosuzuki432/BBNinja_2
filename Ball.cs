@@ -137,7 +137,7 @@ Main functions are:
     private void CheckConstantSpeed()
     {
         Vector2 VelocityNormalized = rigidbody.velocity.normalized;
-        rigidbody.velocity = VelocityNormalized * ballConstSpeed;
+        rigidbody.velocity = VelocityNormalized * Time.deltaTime * ballConstSpeed;
 
     }
 
